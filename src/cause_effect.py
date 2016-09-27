@@ -91,8 +91,8 @@ def __test_cause_effect():
         None
     """
 
-    x = np.array([np.random.rand() for _ in xrange(1000)])
-    y = -100 * x + 4*np.random.rand()
+    x = np.array([np.random.randn() for _ in xrange(1000)])
+    y = 5 * x + 5
     train = [(xx, yy) for xx, yy in zip(x[:750], y[:750])]
     test = [(xx, yy) for xx, yy in zip(x[750:], y[750:])]
     dir = ce(train=train, test=test)
