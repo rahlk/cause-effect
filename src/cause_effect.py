@@ -55,7 +55,7 @@ def dependence(x, y):
     """
 
 
-def cause_effect(train, test):
+def ce(train, test):
     """
     Runs the cause effect test.
     Args:
@@ -63,14 +63,24 @@ def cause_effect(train, test):
         y: Target Data
 
     Returns:
-        dir: "forward", "backward", or None
-
+        dir: 1: X->Y, -1:Y->X, or 0: No causality
     """
 
-    # Check X -> y
     e_y = predict_residuals(train, test, forward=True)
     e_x = predict_residuals(train, test, forward=False)
-    set_trace()
+    x_val = unpack(test, axis=0)
+    y_val = unpack(test, axis=1)
+    nx = x_val.shape[0]
+    hsic = CHSIC()
+    c_xy = hsic.UnBiasedHSIC(x_val.reshape(nx, 1), e_y)
+    c_yx = hsic.UnBiasedHSIC(y_val.reshape(nx, 1), e_x)
+
+    if c_xy < c_yx:
+        return 1
+    elif c_yx < c_xy:
+        return -1
+    else:
+        return 0
 
 
 def __test_cause_effect():
@@ -82,10 +92,11 @@ def __test_cause_effect():
     """
 
     x = np.array([np.random.rand() for _ in xrange(1000)])
-    y = 5 * x + np.random.rand()
+    y = -100 * x + 4*np.random.rand()
     train = [(xx, yy) for xx, yy in zip(x[:750], y[:750])]
     test = [(xx, yy) for xx, yy in zip(x[750:], y[750:])]
-    cause_effect(train=train, test=test)
+    dir = ce(train=train, test=test)
+    set_trace()
 
 
 if __name__ == "__main__":
