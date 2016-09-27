@@ -60,7 +60,7 @@ class CHSIC(object):
         else:
             kMat = numpy.outerproduct(x, x)
 
-        hlhMat = ComputeHLH(y, kernely)
+        hlhMat = self.ComputeHLH(y, kernely)
         return numpy.sum(numpy.sum(kMat * hlhMat)) / ((nx[0] - 1) * (nx[0] - 1))
 
     ## Objective of the biased HSIC when performing optimization over

@@ -3,7 +3,7 @@ from bahsic.hsic import CHSIC
 import numpy as np
 from pdb import set_trace
 from sklearn.linear_model import LinearRegression
-from sklearn.isotonic import IsotonicRegression
+from sklearn.gaussian_process import GaussianProcess
 
 
 def unpack(lst, axis):
