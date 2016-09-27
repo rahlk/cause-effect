@@ -7,7 +7,7 @@ from sklearn.gaussian_process import GaussianProcess
 
 
 def unpack(lst, axis):
-    return np.array([l[axis] for l in lst], ndmin=1)
+    return np.atleast_2d([l[axis] for l in lst]).T
 
 
 def predict_residuals(train, test, forward):
@@ -21,8 +21,8 @@ def predict_residuals(train, test, forward):
         y_hat: Estimated Output
 
     """
-    lrm = LinearRegression()
-
+    mdl = LinearRegression()
+    # mdl = GaussianProcess(theta0=1e-2, thetaL=1e-4, thetaU=1e-1)
     if forward:
         X = unpack(train, axis=0)
         y = unpack(train, axis=1)
@@ -34,11 +34,8 @@ def predict_residuals(train, test, forward):
         x_hat = unpack(test, axis=1)
         y_hat = unpack(test, axis=0)
 
-    N = len(X)
-    n = len(x_hat)
-    lrm.fit(X.reshape(N, 1), y.reshape(N, 1))
-
-    return y_hat - lrm.predict(x_hat.reshape(n, 1))
+    mdl.fit(X, y)
+    return y_hat - mdl.predict(x_hat)
 
 
 def dependence(x, y):
@@ -72,8 +69,8 @@ def ce(train, test):
     y_val = unpack(test, axis=1)
     nx = x_val.shape[0]
     hsic = CHSIC()
-    c_xy = hsic.UnBiasedHSIC(x_val.reshape(nx, 1), e_y)
-    c_yx = hsic.UnBiasedHSIC(y_val.reshape(nx, 1), e_x)
+    c_xy = hsic.UnBiasedHSIC(x_val, e_y)
+    c_yx = hsic.UnBiasedHSIC(y_val, e_x)
 
     if c_xy < c_yx:
         return 1
