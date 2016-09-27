@@ -7,10 +7,10 @@ from sklearn.isotonic import IsotonicRegression
 
 
 def unpack(lst, axis):
-    return [l[axis] for l in lst]
+    return np.array([l[axis] for l in lst], ndmin=1)
 
 
-def regression(train, x_hat):
+def predict_residuals(train, test, forward):
     """
     Linear Regression
     Args:
@@ -22,11 +22,23 @@ def regression(train, x_hat):
 
     """
     lrm = LinearRegression()
-    X = unpack(train, axis=0)
-    y = unpack(train, axis=1)
-    lrm.fit(X, y)
 
-    return lrm.predict(x_hat)
+    if forward:
+        X = unpack(train, axis=0)
+        y = unpack(train, axis=1)
+        x_hat = unpack(test, axis=0)
+        y_hat = unpack(test, axis=1)
+    else:
+        X = unpack(train, axis=1)
+        y = unpack(train, axis=0)
+        x_hat = unpack(test, axis=1)
+        y_hat = unpack(test, axis=0)
+
+    N = len(X)
+    n = len(x_hat)
+    lrm.fit(X.reshape(N, 1), y.reshape(N, 1))
+
+    return y_hat - lrm.predict(x_hat.reshape(n, 1))
 
 
 def dependence(x, y):
@@ -56,9 +68,8 @@ def cause_effect(train, test):
     """
 
     # Check X -> y
-    x_act = unpack(test, axis=0)
-    y_act = unpack(test, axis=1)
-    y_pred = regression(train, x_act)
+    e_y = predict_residuals(train, test, forward=True)
+    e_x = predict_residuals(train, test, forward=False)
     set_trace()
 
 
