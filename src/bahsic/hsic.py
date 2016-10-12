@@ -1,5 +1,5 @@
 """
-This module perform computation related to Hilber-Schmidt Independence
+This module performs computation related to Hilber-Schmidt Independence
 Criterion. Hilber-Schmidt Independence Criterion is short for HSIC.
 
 HISC is defined as $HSIC=\frac{1}{m}Tr(KHLH)$, where $kMat$ and $lMat$
